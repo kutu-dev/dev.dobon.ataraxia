@@ -14,13 +14,32 @@ namespace dev.dobon.ataraxia;
 public interface IComponent;
 public interface IComponentPool;
 
-public sealed class ComponentPool<T>: IComponentPool where T: IComponent
+public sealed class ComponentPool<T>: IComponentPool where T: class, IComponent
 {
-    private List<T> _pool = [];
+    private List<T?> _pool = [];
 
     public void Add(Entity entity, T value)
     {
-        _pool.Insert(entity.Id, value);
+        if (_pool.Count > entity.Id)
+        {
+            _pool[entity.Id] = value;
+            return;
+        }
+
+        if (_pool.Count == entity.Id)
+        {
+            _pool.Add(value);
+            return;
+        }
+
+        var missingEntities = entity.Id - _pool.Count;
+
+        for (var i = 0; i < missingEntities; i++)
+        {
+            _pool.Add(null);
+        }
+        
+        _pool.Add(value);
     }
     
     public T? Get(Entity entity)
@@ -53,7 +72,7 @@ public sealed class Ecs
         return new Entity(_nextEntityId++);
     }
     
-    public void RegisterComponent<T>() where T : IComponent
+    public void RegisterComponent<T>() where T : class, IComponent
     {
         _components[typeof(T)] = new ComponentPool<T>();
     }
@@ -85,22 +104,22 @@ public sealed class Ecs
         }
     }
 
-    public ComponentPool<T> GetComponentPool<T>() where T : IComponent
+    public ComponentPool<T> GetComponentPool<T>() where T : class, IComponent
     {
         return (ComponentPool<T>)_components[typeof(T)];
     }
     
-    public T? GetComponentOfEntity<T>(Entity entity) where T : IComponent
+    public T? GetComponentOfEntity<T>(Entity entity) where T : class, IComponent
     {
         return GetComponentPool<T>().Get(entity);
     }
 
-    public void AddComponentToEntity<T>(Entity entity) where T : IComponent, IDefault<T>
+    public void AddComponentToEntity<T>(Entity entity) where T : class, IComponent, IDefault<T>
     {
         AddComponentToEntity(entity, T.Default());
     }
 
-    public void AddComponentToEntity<T>(Entity entity, T value) where T : IComponent
+    public void AddComponentToEntity<T>(Entity entity, T value) where T : class, IComponent
     {
         GetComponentPool<T>().Add(entity, value);
     }

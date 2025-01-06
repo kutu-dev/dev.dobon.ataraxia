@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("dev.dobon.ataraxia")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e60013887932d76a9b33f2ab2be483b3cf3878bb")]
 [assembly: System.Reflection.AssemblyProductAttribute("dev.dobon.ataraxia")]
 [assembly: System.Reflection.AssemblyTitleAttribute("dev.dobon.ataraxia")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

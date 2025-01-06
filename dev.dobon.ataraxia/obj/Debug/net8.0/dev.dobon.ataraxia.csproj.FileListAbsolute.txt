@@ -43,3 +43,4 @@
 /home/kutu/Documents/Dev/dev.dobon.ataraxia/dev.dobon.ataraxia/bin/Debug/net8.0/System.Text.Encodings.Web.dll
 /home/kutu/Documents/Dev/dev.dobon.ataraxia/dev.dobon.ataraxia/bin/Debug/net8.0/System.Text.Json.dll
 /home/kutu/Documents/Dev/dev.dobon.ataraxia/dev.dobon.ataraxia/bin/Debug/net8.0/runtimes/browser/lib/net8.0/System.Text.Encodings.Web.dll
+/home/kutu/Documents/Dev/dev.dobon.ataraxia/dev.dobon.ataraxia/obj/Debug/net8.0/dev.dobon.ataraxia.sourcelink.json

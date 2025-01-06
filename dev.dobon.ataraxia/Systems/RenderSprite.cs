@@ -4,6 +4,7 @@ using dev.dobon.ataraxia.Components;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Vector2 = System.Numerics.Vector2;
 
 namespace dev.dobon.ataraxia.Systems;
 
@@ -29,7 +30,17 @@ public sealed class RenderSprite: ISystem
         {
             _sprites.Add(sprite.TexturePath, contentManager.Load<Texture2D>(sprite.TexturePath));
         }
-        
-        spriteBatch.Draw(_sprites[sprite.TexturePath], transform.Position, Color.White);
+
+        var spriteTexture = _sprites[sprite.TexturePath];
+
+        // Just center the sprite until anchoring is needed 
+        var spriteOrigin = new Vector2
+        {
+            X = spriteTexture.Width / 2,
+            Y = spriteTexture.Height / 2
+        };
+
+        spriteBatch.Draw(spriteTexture, transform.Position, null, Color.White, transform.Rotation,
+            spriteOrigin, transform.Scale, SpriteEffects.None, 0f);
     }
 }
