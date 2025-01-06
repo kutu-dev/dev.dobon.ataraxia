@@ -1,0 +1,4 @@
+Source File,Dest File,Processor Type,Content Type,Source File Size,Dest File Size,Build Seconds
+"/home/kutu/Documents/Dev/dev.dobon.ataraxia/dev.dobon.ataraxia/Content/ball.png","/home/kutu/Documents/Dev/dev.dobon.ataraxia/dev.dobon.ataraxia/Content/bin/DesktopGL/ball.xnb","TextureProcessor","Texture2DContent",8368,16469,0.1481748
+"/home/kutu/Documents/Dev/dev.dobon.ataraxia/dev.dobon.ataraxia/Content/Pear.png","/home/kutu/Documents/Dev/dev.dobon.ataraxia/dev.dobon.ataraxia/Content/bin/DesktopGL/Pear.xnb","TextureProcessor","Texture2DContent",179,1109,0.1464264
+"/home/kutu/Documents/Dev/dev.dobon.ataraxia/dev.dobon.ataraxia/Content/test.png","/home/kutu/Documents/Dev/dev.dobon.ataraxia/dev.dobon.ataraxia/Content/bin/DesktopGL/test.xnb","TextureProcessor","Texture2DContent",1304,230485,0.1488186
