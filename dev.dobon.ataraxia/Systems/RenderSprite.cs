@@ -36,8 +36,8 @@ public sealed class RenderSprite: ISystem
         // Just center the sprite until anchoring is needed 
         var spriteOrigin = new Vector2
         {
-            X = spriteTexture.Width / 2,
-            Y = spriteTexture.Height / 2
+            X = spriteTexture.Width / 2.0f,
+            Y = spriteTexture.Height / 2.0f
         };
 
         spriteBatch.Draw(spriteTexture, transform.Position, null, Color.White, transform.Rotation,

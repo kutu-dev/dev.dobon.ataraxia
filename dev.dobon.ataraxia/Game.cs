@@ -39,7 +39,7 @@ public sealed partial class Game : Microsoft.Xna.Framework.Game
         _graphics = new GraphicsDeviceManager(this);
         _graphics.PreferredBackBufferWidth = DefaultWindowWidth;
         _graphics.PreferredBackBufferHeight = DefaultWindowHeight;
-        
+
         Content.RootDirectory = "Content";
         IsMouseVisible = false;
         
