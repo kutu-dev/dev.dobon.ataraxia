@@ -8,7 +8,7 @@ namespace dev.dobon.ataraxia.Systems;
 
 public class CalculateCameraMatrix: ISystem
 {
-    public void Render(Ecs ecs, Entity entity, GameTime gameTime, ContentManager contentManager, SpriteBatch spriteBatch)
+    public void Process(Ecs ecs, Entity entity, GameTime gameTime, ContentManager contentManager, SpriteBatch spriteBatch)
     {
         var camera = ecs.GetComponentOfEntity<Camera>(entity);
         if (camera == null)
@@ -24,6 +24,8 @@ public class CalculateCameraMatrix: ISystem
         
         var floorPositionX = MathF.Floor(transform.Position.X);
         var floorPositionY = MathF.Floor(transform.Position.Y);
+        
+        Console.WriteLine(transform.Position.X);
         
         camera.Offset = new Vector2(-(transform.Position.X - floorPositionX), -(transform.Position.Y - floorPositionY));
         

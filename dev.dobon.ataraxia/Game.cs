@@ -81,7 +81,7 @@ public sealed partial class Game : Microsoft.Xna.Framework.Game
         
         _activeCamera = _ecs.CreateEntity();
         _ecs.AddComponentToEntity<Transform>(_activeCamera);
-        _ecs.AddComponentToEntity(_activeCamera, new Kinematics(new Vector2(1.0f, 0.0f), Vector2.Zero));
+        _ecs.AddComponentToEntity(_activeCamera, new Kinematics(new Vector2(10.0f, 0.0f), Vector2.Zero));
         _ecs.AddComponentToEntity(_activeCamera, new Camera(1.0f));
     }
 
@@ -99,7 +99,7 @@ public sealed partial class Game : Microsoft.Xna.Framework.Game
 
     protected override void Update(GameTime gameTime)
     {
-        _ecs.ProcessSystems(gameTime);
+        _ecs.ProcessSystems(gameTime, Content, _spriteBatch);
         
         base.Update(gameTime);
     }

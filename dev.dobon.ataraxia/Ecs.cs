@@ -55,7 +55,7 @@ public sealed class Entity(int id)
 
 public interface ISystem
 {
-    public void Process(Ecs ecs, Entity entity, GameTime gameTime) {}
+    public void Process(Ecs ecs, Entity entity, GameTime gameTime, ContentManager contentManager, SpriteBatch spriteBatch) {}
     
     public void Render(Ecs ecs, Entity entity, GameTime gameTime, ContentManager contentManager, SpriteBatch spriteBatch) {}
 }
@@ -82,13 +82,13 @@ public sealed class Ecs
         _systems.Add(new T());
     }
 
-    public void ProcessSystems(GameTime gameTime)
+    public void ProcessSystems(GameTime gameTime, ContentManager contentManager, SpriteBatch spriteBatch)
     {
         foreach (var entityId in Enumerable.Range( 0, _nextEntityId ))
         {
             foreach (var system in _systems)
             {
-                system.Process(this, new Entity(entityId), gameTime);
+                system.Process(this, new Entity(entityId), gameTime, contentManager, spriteBatch);
             }
         }
     }
