@@ -13,9 +13,6 @@ public sealed partial class Game : Microsoft.Xna.Framework.Game
     public const int LowResWidth = 320;
     public const int LowResHeight = 180;
     
-    private const int MinWindowWidth = LowResWidth * 3;
-    private const int MinWindowHeight = LowResHeight * 3;
-    
     private const int DefaultWindowWidth = 1280;
     private const int DefaultWindowHeight = 720;
  
@@ -50,8 +47,8 @@ public sealed partial class Game : Microsoft.Xna.Framework.Game
     {
         // TODO: This doesn't affect the real window size
         // TODO: Check: https://github.com/MonoGame/MonoGame/issues/8621
-        _graphics.PreferredBackBufferWidth = Window.ClientBounds.Width < MinWindowWidth ? MinWindowWidth : Window.ClientBounds.Width;
-        _graphics.PreferredBackBufferHeight = Window.ClientBounds.Height < MinWindowHeight ? MinWindowHeight : Window.ClientBounds.Height;
+        _graphics.PreferredBackBufferWidth = Window.ClientBounds.Width < LowResWidth ? LowResWidth : Window.ClientBounds.Width;
+        _graphics.PreferredBackBufferHeight = Window.ClientBounds.Height < LowResHeight ? LowResHeight : Window.ClientBounds.Height;
         
         _graphics.ApplyChanges();
     }
@@ -82,11 +79,12 @@ public sealed partial class Game : Microsoft.Xna.Framework.Game
         _activeCamera = _ecs.CreateEntity();
         _ecs.AddComponentToEntity<Transform>(_activeCamera);
         _ecs.AddComponentToEntity(_activeCamera, new Kinematics(new Vector2(1.0f, 0.0f), Vector2.Zero));
-        _ecs.AddComponentToEntity(_activeCamera, new Camera(1.0f));
+        _ecs.AddComponentToEntity(_activeCamera, new Camera(2.0f));
     }
 
     protected override void Initialize()
     {
+        // Add one to hide the offset in the camera movement
         _lowResRenderTarget = new RenderTarget2D(GraphicsDevice, LowResWidth + 1, LowResHeight + 1);
 
         base.Initialize();
@@ -106,19 +104,26 @@ public sealed partial class Game : Microsoft.Xna.Framework.Game
 
     private void RenderLowRes(Camera camera, SpriteBatch spriteBatch)
     {   
-        var widthScale = _graphics.PreferredBackBufferWidth / (float)LowResWidth;
-        var heightScale = _graphics.PreferredBackBufferHeight / (float)LowResHeight;
+        // Important!: The scales should always be integers to ensure that pixels are squares (pixel perfect)
+        // that means that resolutions that are not multiples of the original low res one will not work
+        var widthScale = _graphics.PreferredBackBufferWidth / LowResWidth;
+        var heightScale = _graphics.PreferredBackBufferHeight / LowResHeight;
         
         var targetScale = Math.Min(widthScale, heightScale);
         
-        var targetWidth = (int)(LowResWidth * targetScale);
-        var targetHeight = (int)(LowResHeight * targetScale);
+        var targetWidth = LowResWidth * targetScale;
+        var targetHeight = LowResHeight * targetScale;
         
-        var lowResWidthPosition = (_graphics.PreferredBackBufferWidth - targetWidth) / 2;
-        var lowResHeightPosition = (_graphics.PreferredBackBufferHeight - targetHeight) / 2;
+        var upscaledPositionX = (_graphics.PreferredBackBufferWidth - targetWidth) / 2;
+        var upscaledPositionY = (_graphics.PreferredBackBufferHeight - targetHeight) / 2;
 
-        var highResRenderTarget = new RenderTarget2D(GraphicsDevice, targetWidth + (int)targetScale, targetHeight + (int)targetScale);
-        GraphicsDevice.SetRenderTarget(highResRenderTarget);
+        var upscaledWidth = targetWidth + targetScale;
+        var upscaledHeight = targetWidth + targetScale;
+        
+        var upscaledResRenderTarget = new RenderTarget2D(GraphicsDevice, upscaledWidth, upscaledHeight);
+        
+        GraphicsDevice.SetRenderTarget(upscaledResRenderTarget);
+        
         spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp);
         spriteBatch.Draw(_lowResRenderTarget, new Vector2(
                 0, 0
@@ -127,11 +132,13 @@ public sealed partial class Game : Microsoft.Xna.Framework.Game
         spriteBatch.End();
         
         GraphicsDevice.SetRenderTarget(null);
-        spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.LinearClamp);
-        spriteBatch.Draw(highResRenderTarget, new Vector2(
-                lowResWidthPosition + camera.Offset.X * targetScale,
-                lowResHeightPosition +camera.Offset.Y * targetScale
-            ), null,
+        
+        spriteBatch.Begin();
+        spriteBatch.Draw(upscaledResRenderTarget, new Vector2(
+                upscaledPositionX + camera.Offset.X * targetScale * camera.Zoom,
+                upscaledPositionY + camera.Offset.Y * targetScale * camera.Zoom
+            ), 
+            null,
             Color.White, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0f);
         
         spriteBatch.End();
