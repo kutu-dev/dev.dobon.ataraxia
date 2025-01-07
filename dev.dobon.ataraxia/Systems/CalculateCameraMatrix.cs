@@ -22,14 +22,12 @@ public class CalculateCameraMatrix: ISystem
             return;
         }
         
-        var positionX = transform.Position.X;
-        var positionY = transform.Position.Y;
+        var floorPositionX = MathF.Floor(transform.Position.X);
+        var floorPositionY = MathF.Floor(transform.Position.Y);
         
-        var floorPositionX = float.Floor(positionX);
-        var floorPositionY = float.Floor(positionY);
+        camera.Offset = new Vector2(-(transform.Position.X - floorPositionX), -(transform.Position.Y - floorPositionY));
         
-        camera.Offset = new Vector2(floorPositionX - positionX, floorPositionY - positionY);
-        
-        camera.Matrix = Matrix.Invert(Matrix.CreateTranslation(floorPositionX, floorPositionY, 0));
+        camera.Matrix = Matrix.CreateTranslation(-floorPositionX, -floorPositionY, 0.0f) *
+                        Matrix.CreateTranslation(new Vector3(Game.LowResWidth * 0.5f, Game.LowResHeight * 0.5f, 0.0f));;
     }
 }

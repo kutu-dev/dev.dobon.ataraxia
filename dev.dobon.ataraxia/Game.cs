@@ -105,7 +105,7 @@ public sealed partial class Game : Microsoft.Xna.Framework.Game
     }
 
     private void RenderLowRes(Camera camera, SpriteBatch spriteBatch)
-    {
+    {   
         var widthScale = _graphics.PreferredBackBufferWidth / (float)LowResWidth;
         var heightScale = _graphics.PreferredBackBufferHeight / (float)LowResHeight;
         
@@ -119,10 +119,10 @@ public sealed partial class Game : Microsoft.Xna.Framework.Game
 
         spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.LinearClamp);
         spriteBatch.Draw(_lowResRenderTarget, new Vector2(
-                lowResWidthPosition + camera.Offset.X * targetScale,
-                lowResHeightPosition + camera.Offset.Y * targetScale
+                camera.Offset.X * targetScale,
+                camera.Offset.Y * targetScale
             ), null,
-            Color.White, 0.0f, Vector2.Zero, 4.0f, SpriteEffects.None, 0f);
+            Color.White, 0.0f, Vector2.Zero, targetScale, SpriteEffects.None, 0f);
         
         spriteBatch.End();
     }
