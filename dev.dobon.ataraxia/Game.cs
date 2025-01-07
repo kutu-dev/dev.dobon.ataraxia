@@ -66,20 +66,28 @@ public sealed partial class Game : Microsoft.Xna.Framework.Game
         _ecs.RegisterSystem<Movement>();
         _ecs.RegisterSystem<RenderSprite>();
         _ecs.RegisterSystem<CalculateCameraMatrix>();
-
-        _activeCamera = _ecs.CreateEntity();
-        _ecs.AddComponentToEntity<Transform>(_activeCamera);
-        //_ecs.AddComponentToEntity(_activeCamera, new Kinematics(new Vector2(1f, 1f), Vector2.Zero));
-        _ecs.AddComponentToEntity<Camera>(_activeCamera);
+        
+        var entity2 = _ecs.CreateEntity();
+        _ecs.AddComponentToEntity(entity2, new Transform(new Vector2(0.0f, 0.0f), 0.0f, new Vector2(1.0f, 1.0f)));
+        _ecs.AddComponentToEntity(entity2, new Sprite("test"));
         
         var entity = _ecs.CreateEntity();
-        _ecs.AddComponentToEntity(entity, new Transform(new Vector2(0.0f, 0.0f), 45.0f, new Vector2(2.5f, 2.0f)));
+        _ecs.AddComponentToEntity(entity, new Transform(new Vector2(0.0f, 0.0f), 0.0f, new Vector2(1.0f, 1.0f)));
         _ecs.AddComponentToEntity(entity, new Sprite("Pear"));
+        
+        var entity3 = _ecs.CreateEntity();
+        _ecs.AddComponentToEntity(entity3, new Transform(new Vector2(160.0f, 0.0f), 0.0f, new Vector2(1.0f, 1.0f)));
+        _ecs.AddComponentToEntity(entity3, new Sprite("Pear"));
+        
+        _activeCamera = _ecs.CreateEntity();
+        _ecs.AddComponentToEntity<Transform>(_activeCamera);
+        _ecs.AddComponentToEntity(_activeCamera, new Kinematics(new Vector2(1.0f, 0.0f), Vector2.Zero));
+        _ecs.AddComponentToEntity(_activeCamera, new Camera(1.0f));
     }
 
     protected override void Initialize()
     {
-        _lowResRenderTarget = new RenderTarget2D(GraphicsDevice, LowResWidth, LowResHeight);
+        _lowResRenderTarget = new RenderTarget2D(GraphicsDevice, LowResWidth + 1, LowResHeight + 1);
 
         base.Initialize();
     }
@@ -96,10 +104,8 @@ public sealed partial class Game : Microsoft.Xna.Framework.Game
         base.Update(gameTime);
     }
 
-    private void RenderLowRes(SpriteBatch spriteBatch)
+    private void RenderLowRes(Camera camera, SpriteBatch spriteBatch)
     {
-        GraphicsDevice.SetRenderTarget(null);
-        
         var widthScale = _graphics.PreferredBackBufferWidth / (float)LowResWidth;
         var heightScale = _graphics.PreferredBackBufferHeight / (float)LowResHeight;
         
@@ -111,43 +117,41 @@ public sealed partial class Game : Microsoft.Xna.Framework.Game
         var lowResWidthPosition = (_graphics.PreferredBackBufferWidth - targetWidth) / 2;
         var lowResHeightPosition = (_graphics.PreferredBackBufferHeight - targetHeight) / 2;
 
-        spriteBatch.Begin(SpriteSortMode.BackToFront, BlendState.AlphaBlend, SamplerState.PointClamp);
-        spriteBatch.Draw(_lowResRenderTarget,
-            new Rectangle(
-                lowResWidthPosition,
-                lowResHeightPosition,
-                targetWidth,
-                targetHeight),
-            Color.White);
+        spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.LinearClamp);
+        spriteBatch.Draw(_lowResRenderTarget, new Vector2(
+                lowResWidthPosition + camera.Offset.X * targetScale,
+                lowResHeightPosition + camera.Offset.Y * targetScale
+            ), null,
+            Color.White, 0.0f, Vector2.Zero, 4.0f, SpriteEffects.None, 0f);
+        
         spriteBatch.End();
     }
     
     protected override void Draw(GameTime gameTime)
     {
-        GraphicsDevice.Clear(Color.Black);
-
-        GraphicsDevice.SetRenderTarget(_lowResRenderTarget);
-
         if (_spriteBatch is null)
         {
             SpriteBatchUnavailableCritical(_logger);
             Exit();
             return;
         }
-
-        var transformMatrix = _ecs.GetComponentOfEntity<Camera>(_activeCamera)?.Matrix;
-        if (transformMatrix is null)
+        
+        var camera = _ecs.GetComponentOfEntity<Camera>(_activeCamera);
+        if (camera is null)
         {
             ActiveCameraInvalidEntityCritical(_logger);
             Exit();
             return;
         }
         
-        _spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: transformMatrix);
+        GraphicsDevice.SetRenderTarget(_lowResRenderTarget);
+        _spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: camera.Matrix);
         _ecs.RenderSystems(gameTime, Content, _spriteBatch);
         _spriteBatch.End();
         
-        RenderLowRes(_spriteBatch);
+        GraphicsDevice.SetRenderTarget(null);
+        RenderLowRes(camera, _spriteBatch);
+
         base.Draw(gameTime);
     }
     

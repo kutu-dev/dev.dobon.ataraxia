@@ -1,3 +1,4 @@
+using System;
 using dev.dobon.ataraxia.Components;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -20,10 +21,15 @@ public class CalculateCameraMatrix: ISystem
         {
             return;
         }
-
-        var positionX = transform.Position.X + Game.LowResWidth / 2;
-        var positionY = transform.Position.Y + Game.LowResHeight / 2;
         
-        camera.Matrix = Matrix.CreateTranslation(positionX, positionY, 0) * Matrix.CreateScale(new Vector3(camera.Zoom, camera.Zoom, 1));
+        var positionX = transform.Position.X;
+        var positionY = transform.Position.Y;
+        
+        var floorPositionX = float.Floor(positionX);
+        var floorPositionY = float.Floor(positionY);
+        
+        camera.Offset = new Vector2(floorPositionX - positionX, floorPositionY - positionY);
+        
+        camera.Matrix = Matrix.Invert(Matrix.CreateTranslation(floorPositionX, floorPositionY, 0));
     }
 }
