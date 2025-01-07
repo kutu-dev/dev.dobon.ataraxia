@@ -81,7 +81,7 @@ public sealed partial class Game : Microsoft.Xna.Framework.Game
         
         _activeCamera = _ecs.CreateEntity();
         _ecs.AddComponentToEntity<Transform>(_activeCamera);
-        _ecs.AddComponentToEntity(_activeCamera, new Kinematics(new Vector2(10.0f, 0.0f), Vector2.Zero));
+        _ecs.AddComponentToEntity(_activeCamera, new Kinematics(new Vector2(1.0f, 0.0f), Vector2.Zero));
         _ecs.AddComponentToEntity(_activeCamera, new Camera(1.0f));
     }
 
@@ -117,12 +117,22 @@ public sealed partial class Game : Microsoft.Xna.Framework.Game
         var lowResWidthPosition = (_graphics.PreferredBackBufferWidth - targetWidth) / 2;
         var lowResHeightPosition = (_graphics.PreferredBackBufferHeight - targetHeight) / 2;
 
-        spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.LinearClamp);
+        var highResRenderTarget = new RenderTarget2D(GraphicsDevice, targetWidth + (int)targetScale, targetHeight + (int)targetScale);
+        GraphicsDevice.SetRenderTarget(highResRenderTarget);
+        spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp);
         spriteBatch.Draw(_lowResRenderTarget, new Vector2(
-                camera.Offset.X * targetScale,
-                camera.Offset.Y * targetScale
+                0, 0
             ), null,
             Color.White, 0.0f, Vector2.Zero, targetScale, SpriteEffects.None, 0f);
+        spriteBatch.End();
+        
+        GraphicsDevice.SetRenderTarget(null);
+        spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.LinearClamp);
+        spriteBatch.Draw(highResRenderTarget, new Vector2(
+                lowResWidthPosition + camera.Offset.X * targetScale,
+                lowResHeightPosition +camera.Offset.Y * targetScale
+            ), null,
+            Color.White, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0f);
         
         spriteBatch.End();
     }
@@ -149,7 +159,6 @@ public sealed partial class Game : Microsoft.Xna.Framework.Game
         _ecs.RenderSystems(gameTime, Content, _spriteBatch);
         _spriteBatch.End();
         
-        GraphicsDevice.SetRenderTarget(null);
         RenderLowRes(camera, _spriteBatch);
 
         base.Draw(gameTime);
